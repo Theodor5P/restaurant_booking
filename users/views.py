@@ -8,7 +8,16 @@ from bookings.models import Booking
 
 
 def register(request):
-    """User registration view."""
+    """
+    Handles user registration.
+    
+    **Context**
+    ``form``
+        An instance of :form:`users.UserRegistrationForm`.
+    
+    **Template:**
+    :template:`users/register.html`
+    """
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
@@ -27,7 +36,12 @@ def register(request):
 
 
 def user_login(request):
-    """User login view."""
+    """
+    Handles user login.
+    
+    **Template:**
+    :template:`users/login.html`
+    """
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -45,7 +59,12 @@ def user_login(request):
 
 @login_required
 def user_logout(request):
-    """User logout view."""
+    """
+    Logs out the current user.
+    
+    **Template:**
+    Redirects to :template:`home.html`
+    """
     logout(request)
     messages.success(request, 'You have been successfully logged out.')
     return redirect('home')
@@ -53,7 +72,22 @@ def user_logout(request):
 
 @login_required
 def dashboard(request):
-    """User dashboard view."""
+    """
+    Displays the user dashboard.
+    
+    **Context**
+    ``user``
+        The current :model:`auth.User` instance.
+    ``profile``
+        The :model:`users.UserProfile` instance.
+    ``upcoming_bookings``
+        Queryset of upcoming :model:`bookings.Booking`.
+    ``past_bookings``
+        Queryset of past :model:`bookings.Booking`.
+    
+    **Template:**
+    :template:`users/dashboard.html`
+    """
     user = request.user
     profile = user.profile
     
@@ -79,7 +113,20 @@ def dashboard(request):
 
 @login_required
 def profile(request):
-    """User profile view and update."""
+    """
+    Displays and updates the user profile.
+    
+    **Context**
+    ``user_form``
+        An instance of :form:`users.UserUpdateForm`.
+    ``profile_form``
+        An instance of :form:`users.UserProfileUpdateForm`.
+    ``profile``
+        The :model:`users.UserProfile` instance.
+    
+    **Template:**
+    :template:`users/profile.html`
+    """
     user = request.user
     profile = user.profile
     
@@ -109,7 +156,18 @@ def profile(request):
 
 @login_required
 def booking_history(request):
-    """User booking history view."""
+    """
+    Displays the user's booking history.
+    
+    **Context**
+    ``bookings``
+        Queryset of :model:`bookings.Booking` for the user.
+    ``user``
+        The current :model:`auth.User` instance.
+    
+    **Template:**
+    :template:`users/booking_history.html`
+    """
     user = request.user
     bookings = Booking.objects.filter(customer=user).order_by('-date', '-time_slot__time')
     

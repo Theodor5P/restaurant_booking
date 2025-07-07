@@ -6,7 +6,8 @@ from django.utils import timezone
 
 class Booking(models.Model):
     """
-    Booking model for restaurant reservations.
+    Stores a single restaurant booking entry related to :model:`auth.User`,
+    :model:`restaurants.Restaurant`, and :model:`restaurants.TimeSlot`.
     """
     STATUS_CHOICES = [
         ('confirmed', 'Confirmed'),

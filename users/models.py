@@ -6,7 +6,8 @@ from django.dispatch import receiver
 
 class UserProfile(models.Model):
     """
-    Extended user profile model for role-based access control.
+    Stores an extended user profile entry related to :model:`auth.User` for
+    role-based access control.
     """
     ROLE_CHOICES = [
         ('customer', 'Customer'),

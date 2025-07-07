@@ -5,7 +5,8 @@ from datetime import time
 
 class Restaurant(models.Model):
     """
-    Restaurant model to store restaurant information and configuration.
+    Stores a single restaurant entry with configuration and capacity
+    information.
     """
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -52,7 +53,7 @@ class Restaurant(models.Model):
 
 class TimeSlot(models.Model):
     """
-    Time slot model for restaurant booking times.
+    Stores a single time slot entry related to :model:`restaurants.Restaurant`.
     """
     restaurant = models.ForeignKey(
         Restaurant, 

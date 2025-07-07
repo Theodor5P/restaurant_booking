@@ -4,6 +4,10 @@ from .models import Booking
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
+    """
+    Admin interface for the Booking model, providing list display, filters,
+    search, and custom fieldsets for managing bookings in the admin panel.
+    """
     list_display = ('customer', 'restaurant', 'date', 'time_slot', 'party_size', 'status', 'created_at')
     list_filter = ('status', 'date', 'restaurant', 'time_slot', 'created_at')
     search_fields = ('customer__username', 'customer__email', 'restaurant__name')
@@ -25,6 +29,10 @@ class BookingAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
+        """
+        Returns a queryset with related customer, restaurant, and time_slot
+        objects selected for performance optimization in the admin list view.
+        """
         return super().get_queryset(request).select_related(
             'customer', 'restaurant', 'time_slot'
         ) 

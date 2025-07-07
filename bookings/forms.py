@@ -7,6 +7,13 @@ from restaurants.models import TimeSlot
 class BookingForm(forms.ModelForm):
     """
     Form for creating and editing bookings.
+    
+    Fields:
+        - date, time_slot, party_size, special_requests
+    
+    Meta:
+        model: :model:`bookings.Booking`
+        form: :form:`bookings.BookingForm`
     """
     date = forms.DateField(
         widget=forms.DateInput(
@@ -52,6 +59,9 @@ class BookingForm(forms.ModelForm):
         exclude = ('customer', 'restaurant', 'status', 'created_at', 'updated_at')
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the booking form and filters time slots by restaurant if provided.
+        """
         self.restaurant = kwargs.pop('restaurant', None)
         super().__init__(*args, **kwargs)
         
@@ -63,7 +73,9 @@ class BookingForm(forms.ModelForm):
             )
 
     def clean_date(self):
-        """Validate that the booking date is not in the past."""
+        """
+        Validates that the booking date is not in the past.
+        """
         date = self.cleaned_data.get('date')
         if date and date < timezone.now().date():
             raise forms.ValidationError(
@@ -72,7 +84,9 @@ class BookingForm(forms.ModelForm):
         return date
 
     def clean(self):
-        """Custom validation for booking capacity."""
+        """
+        Custom validation for booking capacity and availability.
+        """
         cleaned_data = super().clean()
         date = cleaned_data.get('date')
         time_slot = cleaned_data.get('time_slot')
@@ -96,6 +110,9 @@ class BookingForm(forms.ModelForm):
 class BookingFilterForm(forms.Form):
     """
     Form for filtering bookings in the booking list view.
+    
+    Fields:
+        - date_from, date_to, status, time_slot
     """
     date_from = forms.DateField(
         required=False,
@@ -134,6 +151,9 @@ class BookingFilterForm(forms.Form):
 class AvailabilityCheckForm(forms.Form):
     """
     Form for checking availability on a specific date.
+    
+    Fields:
+        - date, party_size
     """
     date = forms.DateField(
         widget=forms.DateInput(

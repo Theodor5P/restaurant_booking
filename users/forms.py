@@ -7,6 +7,13 @@ from .models import UserProfile
 class UserRegistrationForm(UserCreationForm):
     """
     Form for user registration with extended profile fields.
+    
+    Fields:
+        - username, email, first_name, last_name, password1, password2, phone_number
+    
+    Meta:
+        model: :model:`auth.User`
+        form: :form:`users.UserRegistrationForm`
     """
     phone_number = forms.CharField(
         max_length=15, 
@@ -38,12 +45,18 @@ class UserRegistrationForm(UserCreationForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the registration form and applies Bootstrap styling to all fields.
+        """
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             if hasattr(field, 'widget') and hasattr(field.widget, 'attrs'):
                 field.widget.attrs.update({'class': 'form-control'})
 
     def save(self, commit=True):
+        """
+        Saves the user and associated profile with the provided phone number and role.
+        """
         user = super().save(commit)
         user.profile.role = 'customer'
         user.profile.phone_number = self.cleaned_data.get('phone_number', '')
@@ -54,6 +67,10 @@ class UserRegistrationForm(UserCreationForm):
 class UserProfileUpdateForm(forms.ModelForm):
     """
     Form for updating user profile information.
+    
+    Meta:
+        model: :model:`users.UserProfile`
+        form: :form:`users.UserProfileUpdateForm`
     """
     class Meta:
         model = UserProfile
@@ -67,6 +84,10 @@ class UserProfileUpdateForm(forms.ModelForm):
 class UserUpdateForm(forms.ModelForm):
     """
     Form for updating basic user information.
+    
+    Meta:
+        model: :model:`auth.User`
+        form: :form:`users.UserUpdateForm`
     """
     class Meta:
         model = User

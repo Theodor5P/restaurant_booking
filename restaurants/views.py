@@ -10,7 +10,16 @@ def get_or_create_profile(user):
 
 
 def restaurant_list(request):
-    """List all restaurants."""
+    """
+    Lists all active restaurants.
+    
+    **Context**
+    ``restaurants``
+        Queryset of :model:`restaurants.Restaurant`.
+    
+    **Template:**
+    :template:`restaurants/restaurant_list.html`
+    """
     restaurants = Restaurant.objects.filter(is_active=True)
     return render(request, 'restaurants/restaurant_list.html', {
         'restaurants': restaurants
@@ -18,7 +27,18 @@ def restaurant_list(request):
 
 
 def restaurant_detail(request, restaurant_id):
-    """Show restaurant details."""
+    """
+    Shows details for a single restaurant.
+    
+    **Context**
+    ``restaurant``
+        The :model:`restaurants.Restaurant` instance.
+    ``time_slots``
+        Queryset of :model:`restaurants.TimeSlot` for the restaurant.
+    
+    **Template:**
+    :template:`restaurants/restaurant_detail.html`
+    """
     restaurant = get_object_or_404(Restaurant, id=restaurant_id, is_active=True)
     time_slots = restaurant.timeslots.filter(is_active=True).order_by('time')
     
@@ -32,7 +52,22 @@ def restaurant_detail(request, restaurant_id):
 
 @login_required
 def restaurant_dashboard(request):
-    """Restaurant staff dashboard."""
+    """
+    Displays the staff dashboard for the restaurant.
+    
+    **Context**
+    ``restaurant``
+        The :model:`restaurants.Restaurant` instance.
+    ``today_bookings``
+        Queryset of today's :model:`bookings.Booking`.
+    ``upcoming_bookings``
+        Queryset of upcoming :model:`bookings.Booking`.
+    ``today``
+        The current date.
+    
+    **Template:**
+    :template:`restaurants/dashboard.html`
+    """
     profile = get_or_create_profile(request.user)
     if not profile.is_staff_member and not request.user.is_staff:
         messages.error(request, 'Access denied. Staff access required.')
@@ -73,7 +108,18 @@ def restaurant_dashboard(request):
 
 
 def time_slot_list(request):
-    """List all time slots for the restaurant."""
+    """
+    Lists all time slots for the active restaurant.
+    
+    **Context**
+    ``restaurant``
+        The :model:`restaurants.Restaurant` instance.
+    ``time_slots``
+        Queryset of :model:`restaurants.TimeSlot` for the restaurant.
+    
+    **Template:**
+    :template:`restaurants/time_slot_list.html`
+    """
     try:
         restaurant = Restaurant.objects.get(is_active=True)
     except Restaurant.DoesNotExist:

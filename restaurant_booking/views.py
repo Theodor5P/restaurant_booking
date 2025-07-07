@@ -6,7 +6,16 @@ from restaurants.models import Restaurant
 
 
 def home(request):
-    """Home page view with restaurant information."""
+    """
+    Renders the home page with restaurant information.
+    
+    **Context**
+    ``restaurant``
+        The :model:`restaurants.Restaurant` instance if available, else None.
+    
+    **Template:**
+    :template:`home.html`
+    """
     try:
         restaurant = Restaurant.objects.get(is_active=True)
     except Restaurant.DoesNotExist:

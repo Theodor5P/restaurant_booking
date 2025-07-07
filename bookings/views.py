@@ -11,7 +11,20 @@ from django.core.exceptions import ValidationError
 
 
 def booking_list(request):
-    """List all bookings with filtering options."""
+    """
+    Lists all bookings with filtering options.
+    
+    **Context**
+    ``page_obj``
+        Paginated bookings (page object) of :model:`bookings.Booking`.
+    ``filter_form``
+        An instance of :form:`bookings.BookingFilterForm`.
+    ``total_bookings``
+        Total number of bookings after filtering.
+    
+    **Template:**
+    :template:`bookings/booking_list.html`
+    """
     bookings = Booking.objects.all().select_related(
         'customer', 'restaurant', 'time_slot'
     ).order_by('-date', '-time_slot__time')
@@ -49,7 +62,20 @@ def booking_list(request):
 
 @login_required
 def create_booking(request):
-    """Create a new booking."""
+    """
+    Creates a new booking for the current user.
+    
+    **Context**
+    ``form``
+        An instance of :form:`bookings.BookingForm`.
+    ``restaurant``
+        The active :model:`restaurants.Restaurant`.
+    ``time_slots``
+        Queryset of available :model:`restaurants.TimeSlot`.
+    
+    **Template:**
+    :template:`bookings/create_booking.html`
+    """
     # Get the restaurant (assuming single restaurant for now)
     try:
         restaurant = Restaurant.objects.get(is_active=True)
@@ -104,7 +130,16 @@ def create_booking(request):
 
 @login_required
 def booking_detail(request, booking_id):
-    """View booking details."""
+    """
+    Displays details for a single booking.
+    
+    **Context**
+    ``booking``
+        The :model:`bookings.Booking` instance.
+    
+    **Template:**
+    :template:`bookings/booking_detail.html`
+    """
     booking = get_object_or_404(
         Booking.objects.select_related('customer', 'restaurant', 'time_slot'),
         id=booking_id
@@ -124,7 +159,18 @@ def booking_detail(request, booking_id):
 
 @login_required
 def edit_booking(request, booking_id):
-    """Edit an existing booking."""
+    """
+    Edits an existing booking.
+    
+    **Context**
+    ``form``
+        An instance of :form:`bookings.BookingForm`.
+    ``booking``
+        The :model:`bookings.Booking` instance being edited.
+    
+    **Template:**
+    :template:`bookings/edit_booking.html`
+    """
     booking = get_object_or_404(Booking, id=booking_id)
     
     # Check permissions
@@ -162,7 +208,16 @@ def edit_booking(request, booking_id):
 
 @login_required
 def cancel_booking(request, booking_id):
-    """Cancel a booking."""
+    """
+    Cancels a booking.
+    
+    **Context**
+    ``booking``
+        The :model:`bookings.Booking` instance being cancelled.
+    
+    **Template:**
+    :template:`bookings/cancel_booking.html`
+    """
     booking = get_object_or_404(Booking, id=booking_id)
     
     # Check permissions
@@ -186,7 +241,16 @@ def cancel_booking(request, booking_id):
 
 @login_required
 def my_bookings(request):
-    """View user's own bookings."""
+    """
+    Displays the current user's bookings.
+    
+    **Context**
+    ``bookings``
+        Queryset of :model:`bookings.Booking` for the current user.
+    
+    **Template:**
+    :template:`bookings/my_bookings.html`
+    """
     user = request.user
     bookings = Booking.objects.filter(
         customer=user
@@ -212,7 +276,16 @@ def my_bookings(request):
 
 
 def restaurant_info(request):
-    """Display restaurant information and availability."""
+    """
+    Shows information about the restaurant.
+    
+    **Context**
+    ``restaurant``
+        The :model:`restaurants.Restaurant` instance.
+    
+    **Template:**
+    :template:`bookings/restaurant_info.html`
+    """
     try:
         restaurant = Restaurant.objects.get(is_active=True)
     except Restaurant.DoesNotExist:
@@ -238,7 +311,20 @@ def restaurant_info(request):
 
 
 def check_availability(request):
-    """Check availability for a specific date and party size."""
+    """
+    Checks table availability for a given date and party size.
+    
+    **Context**
+    ``form``
+        An instance of :form:`bookings.AvailabilityCheckForm`.
+    ``available_time_slots``
+        List of available :model:`restaurants.TimeSlot` for the selected date.
+    ``restaurant``
+        The :model:`restaurants.Restaurant` instance.
+    
+    **Template:**
+    :template:`bookings/check_availability.html`
+    """
     try:
         restaurant = Restaurant.objects.get(is_active=True)
     except Restaurant.DoesNotExist:
