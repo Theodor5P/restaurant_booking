@@ -91,6 +91,18 @@ class Booking(models.Model):
         """Custom validation for booking."""
         from django.core.exceptions import ValidationError
         
+        # Check if required fields are present
+        if self.party_size is None:
+            raise ValidationError("Party size is required.")
+        if self.restaurant is None:
+            raise ValidationError("Restaurant is required.")
+        if self.restaurant.total_capacity is None:
+            raise ValidationError("Restaurant capacity is not set.")
+        if self.time_slot is None:
+            raise ValidationError("Time slot is required.")
+        if self.date is None:
+            raise ValidationError("Date is required.")
+        
         # Check if date is not in the past
         if self.date < timezone.now().date():
             raise ValidationError("Cannot book for past dates.")

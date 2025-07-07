@@ -1,11 +1,147 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Home</title>
-</head>
-<body>
-    <h1>Welcome to the Restaurant Booking Home Page!</h1>
-    <p>This is the home page.</p>
-</body>
-</html> 
+{% extends 'base.html' %}
+
+{% block title %}Welcome - Restaurant Booking System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 mb-4">Welcome to Our Restaurant</h1>
+        <p class="lead mb-4">Experience fine dining with our easy online booking system</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'bookings:create_booking' %}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-calendar-plus me-2"></i>Make a Booking
+            </a>
+            <a href="{% url 'bookings:check_availability' %}" class="btn btn-outline-light btn-lg me-3">
+                <i class="fas fa-search me-2"></i>Check Availability
+            </a>
+        {% else %}
+            <a href="{% url 'users:register' %}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-user-plus me-2"></i>Register Now
+            </a>
+            <a href="{% url 'users:login' %}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </a>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Restaurant Information -->
+{% if restaurant %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="mb-4">{{ restaurant.name }}</h2>
+                <p class="lead mb-4">{{ restaurant.description }}</p>
+                
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-clock fa-2x text-primary mb-3"></i>
+                                <h5 class="card-title">Opening Hours</h5>
+                                <p class="card-text">
+                                    {{ restaurant.opening_time|time:"H:i" }} - {{ restaurant.closing_time|time:"H:i" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                                <h5 class="card-title">Capacity</h5>
+                                <p class="card-text">{{ restaurant.total_capacity }} guests</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                                <h5 class="card-title">Contact</h5>
+                                <p class="card-text">{{ restaurant.phone }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Location</h4>
+                        <p>{{ restaurant.address }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Contact</h4>
+                        <p>
+                            <i class="fas fa-phone me-2"></i>{{ restaurant.phone }}<br>
+                            <i class="fas fa-envelope me-2"></i>{{ restaurant.email }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose Our Booking System?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Easy Online Booking</h5>
+                        <p class="card-text">Book your table in just a few clicks from anywhere, anytime.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-check fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Instant Confirmation</h5>
+                        <p class="card-text">Get immediate confirmation of your reservation via email.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-edit fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Manage Your Bookings</h5>
+                        <p class="card-text">View, edit, or cancel your bookings at any time.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Book Your Table?</h2>
+        <p class="lead mb-4">Join our community of satisfied diners and experience exceptional service.</p>
+        {% if user.is_authenticated %}
+            <a href="{% url 'bookings:create_booking' %}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-calendar-plus me-2"></i>Book Now
+            </a>
+            <a href="{% url 'bookings:check_availability' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-search me-2"></i>Check Availability
+            </a>
+        {% else %}
+            <a href="{% url 'users:register' %}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-user-plus me-2"></i>Get Started
+            </a>
+            <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+            </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %} 

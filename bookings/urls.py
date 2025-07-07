@@ -1,23 +1,18 @@
 from django.urls import path
-from django.http import HttpResponse
-
-def booking_list(request):
-    return HttpResponse("Booking List Page")
-
-def create_booking(request):
-    return HttpResponse("Create Booking Page")
-
-def booking_detail(request, booking_id):
-    return HttpResponse(f"Booking Detail Page - ID: {booking_id}")
-
-def cancel_booking(request, booking_id):
-    return HttpResponse(f"Cancel Booking Page - ID: {booking_id}")
+from . import views
 
 app_name = 'bookings'
 
 urlpatterns = [
-    path('', booking_list, name='booking_list'),
-    path('create/', create_booking, name='create_booking'),
-    path('<int:booking_id>/', booking_detail, name='booking_detail'),
-    path('<int:booking_id>/cancel/', cancel_booking, name='cancel_booking'),
+    # Booking management
+    path('', views.booking_list, name='booking_list'),
+    path('create/', views.create_booking, name='create_booking'),
+    path('my-bookings/', views.my_bookings, name='my_bookings'),
+    path('<int:booking_id>/', views.booking_detail, name='booking_detail'),
+    path('<int:booking_id>/edit/', views.edit_booking, name='edit_booking'),
+    path('<int:booking_id>/cancel/', views.cancel_booking, name='cancel_booking'),
+    
+    # Restaurant information
+    path('restaurant-info/', views.restaurant_info, name='restaurant_info'),
+    path('check-availability/', views.check_availability, name='check_availability'),
 ] 

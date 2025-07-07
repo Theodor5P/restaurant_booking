@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">My Bookings</h1>
+            
+            <!-- Status Filter -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Filter by Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'bookings:my_bookings' %}" class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">
+                            All Bookings
+                        </a>
+                        <a href="{% url 'bookings:my_bookings' %}?status=confirmed" class="btn btn-outline-success {% if status_filter == 'confirmed' %}active{% endif %}">
+                            Confirmed
+                        </a>
+                        <a href="{% url 'bookings:my_bookings' %}?status=completed" class="btn btn-outline-secondary {% if status_filter == 'completed' %}active{% endif %}">
+                            Completed
+                        </a>
+                        <a href="{% url 'bookings:my_bookings' %}?status=cancelled" class="btn btn-outline-danger {% if status_filter == 'cancelled' %}active{% endif %}">
+                            Cancelled
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookings Summary -->
+            <div class="alert alert-info">
+                <strong>{{ total_bookings }}</strong> booking{{ total_bookings|pluralize }} found
+            </div>
+
+            <!-- Bookings List -->
+            {% if page_obj %}
+                <div class="row">
+                    {% for booking in page_obj %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 {% if booking.is_today %}border-warning{% elif booking.is_past %}border-secondary{% else %}border-primary{% endif %}">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ booking.restaurant.name }}</h6>
+                                <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <strong>Date:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        {{ booking.date|date:"M d, Y" }}
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <strong>Time:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        {{ booking.time_slot.formatted_time }}
+                                    </div>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <strong>Party Size:</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        {{ booking.party_size }} person{{ booking.party_size|pluralize }}
+                                    </div>
+                                </div>
+                                {% if booking.special_requests %}
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <strong>Special Requests:</strong>
+                                        <p class="text-muted small mb-0">{{ booking.special_requests|truncatewords:10 }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Status Indicators -->
+                                {% if booking.is_today %}
+                                    <div class="alert alert-warning py-2 mb-2">
+                                        <small><i class="fas fa-calendar-day"></i> Today's booking!</small>
+                                    </div>
+                                {% elif booking.is_past %}
+                                    <div class="alert alert-secondary py-2 mb-2">
+                                        <small><i class="fas fa-history"></i> Past booking</small>
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info py-2 mb-2">
+                                        <small><i class="fas fa-calendar-alt"></i> Upcoming booking</small>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <div class="btn-group w-100" role="group">
+                                    <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    {% if booking.can_cancel %}
+                                        <a href="{% url 'bookings:edit_booking' booking.id %}" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'bookings:cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="My bookings pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}">&laquo; First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}">Last &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">No bookings found!</h4>
+                    <p>You don't have any bookings{% if status_filter %} with status "{{ status_filter }}"{% endif %}.</p>
+                    <hr>
+                    <p class="mb-0">
+                        <a href="{% url 'bookings:create_booking' %}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Make Your First Booking
+                        </a>
+                    </p>
+                </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="mt-4">
+                <a href="{% url 'bookings:create_booking' %}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Create New Booking
+                </a>
+                <a href="{% url 'bookings:restaurant_info' %}" class="btn btn-outline-info">
+                    <i class="fas fa-info-circle"></i> Restaurant Info
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

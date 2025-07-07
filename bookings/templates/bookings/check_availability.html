@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Check Availability{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-search"></i> Check Availability
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Availability Check Form -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt"></i> Select Date & Party Size
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">
+                                <i class="fas fa-calendar"></i> Date
+                            </label>
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.date.help_text }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.party_size.id_for_label }}" class="form-label">
+                                <i class="fas fa-users"></i> Party Size
+                            </label>
+                            {{ form.party_size }}
+                            {% if form.party_size.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.party_size.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.party_size.help_text }}</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Check Availability
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Restaurant Info -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Restaurant Info
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>{{ restaurant.name }}</strong></p>
+                    <p class="mb-1"><small>{{ restaurant.description|truncatewords:10 }}</small></p>
+                    <p class="mb-0"><small><strong>Capacity:</strong> {{ restaurant.total_capacity }} people</small></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Availability Results -->
+        <div class="col-md-8">
+            {% if availability_data %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock"></i> Availability for {{ selected_date|date:"l, F j, Y" }}
+                        </h5>
+                        <small class="text-muted">Party size: {{ selected_party_size }} people</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for slot in availability_data %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100 border-{{ slot.status_class }}">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">{{ slot.time_slot.formatted_time }}</h6>
+                                        <span class="badge bg-{{ slot.status_class }} mb-2">
+                                            {% if slot.status == 'available' %}
+                                                <i class="fas fa-check"></i> Available
+                                            {% elif slot.status == 'limited' %}
+                                                <i class="fas fa-exclamation-triangle"></i> Limited
+                                            {% else %}
+                                                <i class="fas fa-times"></i> Unavailable
+                                            {% endif %}
+                                        </span>
+                                        <p class="card-text small mb-2">{{ slot.status_text }}</p>
+                                        
+                                        {% if slot.status == 'available' %}
+                                            <a href="{% url 'bookings:create_booking' %}?date={{ selected_date|date:'Y-m-d' }}&time_slot={{ slot.time_slot.id }}&party_size={{ selected_party_size }}" 
+                                               class="btn btn-sm btn-success">
+                                                <i class="fas fa-calendar-plus"></i> Book Now
+                                            </a>
+                                        {% elif slot.status == 'limited' %}
+                                            <a href="{% url 'bookings:create_booking' %}?date={{ selected_date|date:'Y-m-d' }}&time_slot={{ slot.time_slot.id }}&party_size={{ slot.available_capacity }}" 
+                                               class="btn btn-sm btn-warning">
+                                                <i class="fas fa-calendar-plus"></i> Book {{ slot.available_capacity }}
+                                            </a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                <i class="fas fa-ban"></i> Fully Booked
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-chart-bar"></i> Summary
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 class="text-success">
+                                    {{ max_available_capacity }}
+                                </h4>
+                                <small class="text-muted">Available Slots</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-warning">
+                                    {{ availability_data|length|add:"-1" }}
+                                </h4>
+                                <small class="text-muted">Total Time Slots</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-primary">{{ restaurant.total_capacity }}</h4>
+                                <small class="text-muted">Restaurant Capacity</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle"></i> Instructions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">How to check availability:</h6>
+                            <ol class="mb-0">
+                                <li>Select a date from the calendar</li>
+                                <li>Enter your party size (1-20 people)</li>
+                                <li>Click "Check Availability" to see available time slots</li>
+                                <li>Click "Book Now" on any available slot to make a reservation</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <div class="border rounded p-3">
+                                    <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                                    <h6>Available</h6>
+                                    <small class="text-muted">Enough seats for your party</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="border rounded p-3">
+                                    <i class="fas fa-exclamation-triangle text-warning fa-2x mb-2"></i>
+                                    <h6>Limited</h6>
+                                    <small class="text-muted">Some seats available</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="border rounded p-3">
+                                    <i class="fas fa-times-circle text-danger fa-2x mb-2"></i>
+                                    <h6>Unavailable</h6>
+                                    <small class="text-muted">Fully booked</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{% url 'bookings:create_booking' %}" class="btn btn-success btn-lg me-3">
+                <i class="fas fa-calendar-plus"></i> Make a Booking
+            </a>
+            <a href="{% url 'bookings:restaurant_info' %}" class="btn btn-outline-info btn-lg me-3">
+                <i class="fas fa-info-circle"></i> Restaurant Info
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

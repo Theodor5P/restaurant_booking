@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Booking{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">
+                        <i class="fas fa-edit"></i> Edit Booking
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <!-- Booking Summary -->
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Current Booking Details</h5>
+                        <p class="mb-1"><strong>Restaurant:</strong> {{ booking.restaurant.name }}</p>
+                        <p class="mb-1"><strong>Date:</strong> {{ booking.date|date:"M d, Y" }}</p>
+                        <p class="mb-1"><strong>Time:</strong> {{ booking.time_slot.formatted_time }}</p>
+                        <p class="mb-0"><strong>Party Size:</strong> {{ booking.party_size }} person{{ booking.party_size|pluralize }}</p>
+                    </div>
+
+                    <!-- Edit Form -->
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Date Field -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar"></i> Date
+                                </label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.date.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Select the date for your booking</div>
+                            </div>
+
+                            <!-- Time Slot Field -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.time_slot.id_for_label }}" class="form-label">
+                                    <i class="fas fa-clock"></i> Time Slot
+                                </label>
+                                {{ form.time_slot }}
+                                {% if form.time_slot.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.time_slot.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Choose your preferred time</div>
+                            </div>
+                        </div>
+
+                        <!-- Party Size Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.party_size.id_for_label }}" class="form-label">
+                                <i class="fas fa-users"></i> Party Size
+                            </label>
+                            {{ form.party_size }}
+                            {% if form.party_size.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.party_size.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Number of guests (1-20 people)</div>
+                        </div>
+
+                        <!-- Special Requests Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.special_requests.id_for_label }}" class="form-label">
+                                <i class="fas fa-comment"></i> Special Requests
+                            </label>
+                            {{ form.special_requests }}
+                            {% if form.special_requests.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.special_requests.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Any dietary requirements or special requests</div>
+                        </div>
+
+                        <!-- Non-field errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Booking
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Update Booking
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Important Notes -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> Important Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                            <strong>Capacity:</strong> Changes are subject to restaurant capacity availability
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-times text-danger"></i>
+                            <strong>Cancellation:</strong> You can only edit confirmed bookings that haven't passed
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-clock text-info"></i>
+                            <strong>Time Slots:</strong> Available times may vary based on current bookings
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add Bootstrap validation classes
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %} 

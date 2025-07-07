@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Booking{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">
+                        <i class="fas fa-times-circle"></i> Cancel Booking
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <!-- Booking Details -->
+                    <div class="alert alert-warning">
+                        <h5 class="alert-heading">Booking Details</h5>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Restaurant:</strong><br>
+                                {{ booking.restaurant.name }}
+                            </div>
+                            <div class="col-6">
+                                <strong>Date:</strong><br>
+                                {{ booking.date|date:"M d, Y" }}
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-6">
+                                <strong>Time:</strong><br>
+                                {{ booking.time_slot.formatted_time }}
+                            </div>
+                            <div class="col-6">
+                                <strong>Party Size:</strong><br>
+                                {{ booking.party_size }} person{{ booking.party_size|pluralize }}
+                            </div>
+                        </div>
+                        {% if booking.special_requests %}
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <strong>Special Requests:</strong><br>
+                                <em>{{ booking.special_requests }}</em>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Cancellation Warning -->
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle"></i> Warning
+                        </h5>
+                        <p class="mb-0">
+                            Are you sure you want to cancel this booking? This action cannot be undone.
+                        </p>
+                    </div>
+
+                    <!-- Cancellation Rules -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-info-circle"></i> Cancellation Policy
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-1">
+                                    <i class="fas fa-check text-success"></i>
+                                    You can cancel confirmed bookings
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-times text-danger"></i>
+                                    Past bookings cannot be cancelled
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-times text-danger"></i>
+                                    Already cancelled bookings cannot be cancelled again
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Cancellation Status -->
+                    {% if booking.can_cancel %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>This booking can be cancelled.</strong>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-ban"></i>
+                            <strong>This booking cannot be cancelled.</strong>
+                            {% if booking.is_past %}
+                                <br>Reason: This is a past booking.
+                            {% elif booking.status == 'cancelled' %}
+                                <br>Reason: This booking is already cancelled.
+                            {% elif booking.status == 'completed' %}
+                                <br>Reason: This booking has been completed.
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Booking
+                        </a>
+                        
+                        {% if booking.can_cancel %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you absolutely sure you want to cancel this booking?')">
+                                    <i class="fas fa-times"></i> Confirm Cancellation
+                                </button>
+                            </form>
+                        {% else %}
+                            <button type="button" class="btn btn-danger" disabled>
+                                <i class="fas fa-times"></i> Cannot Cancel
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alternative Actions -->
+            {% if booking.can_cancel %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb"></i> Alternative Options
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">Instead of cancelling, you could:</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'bookings:edit_booking' booking.id %}" class="btn btn-outline-warning">
+                            <i class="fas fa-edit"></i> Modify the Booking
+                        </a>
+                        <a href="{% url 'bookings:create_booking' %}" class="btn btn-outline-success">
+                            <i class="fas fa-plus"></i> Create a New Booking
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

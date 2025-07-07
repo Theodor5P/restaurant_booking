@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fas fa-tachometer-alt"></i> Staff Dashboard</h1>
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Today's Bookings ({{ today|date:"M d, Y" }})</h4>
+        </div>
+        <div class="card-body">
+            {% if today_bookings %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Customer</th>
+                                <th>Party Size</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in today_bookings %}
+                            <tr>
+                                <td>{{ booking.time_slot.formatted_time }}</td>
+                                <td>{{ booking.customer.get_full_name|default:booking.customer.username }}</td>
+                                <td>{{ booking.party_size }}</td>
+                                <td>
+                                    <span class="badge bg-success">{{ booking.get_status_display }}</span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">No bookings for today.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">Upcoming Bookings</h4>
+        </div>
+        <div class="card-body">
+            {% if upcoming_bookings %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Customer</th>
+                                <th>Party Size</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in upcoming_bookings %}
+                            <tr>
+                                <td>{{ booking.date|date:"M d, Y" }}</td>
+                                <td>{{ booking.time_slot.formatted_time }}</td>
+                                <td>{{ booking.customer.get_full_name|default:booking.customer.username }}</td>
+                                <td>{{ booking.party_size }}</td>
+                                <td>
+                                    <span class="badge bg-success">{{ booking.get_status_display }}</span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">No upcoming bookings.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Restaurant Info</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Name:</strong> {{ restaurant.name }}</p>
+            <p><strong>Capacity:</strong> {{ restaurant.total_capacity }}</p>
+            <p><strong>Opening:</strong> {{ restaurant.opening_time|time:"H:i" }}</p>
+            <p><strong>Closing:</strong> {{ restaurant.closing_time|time:"H:i" }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

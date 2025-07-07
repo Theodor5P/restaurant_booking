@@ -1,10 +1,207 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-</head>
-<body>
-    <h1>Dashboard</h1>
-    <p>Welcome, {{ user.username }}!</p>
-</body>
-</html> 
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Restaurant Booking System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title">
+                        <i class="fas fa-user-circle me-2"></i>Welcome, {{ user.get_full_name|default:user.username }}!
+                    </h2>
+                    <p class="card-text">Manage your restaurant bookings and profile information.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Profile Card -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2"></i>Profile Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Role:</strong>
+                        <span class="badge bg-{% if profile.role == 'admin' %}danger{% elif profile.role == 'staff' %}warning{% else %}success{% endif %}">
+                            {{ profile.get_role_display }}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong><br>
+                        {{ user.email }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Phone:</strong><br>
+                        {{ profile.phone_number|default:"Not provided" }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Member Since:</strong><br>
+                        {{ profile.created_at|date:"F j, Y" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tasks me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="{% url 'bookings:create_booking' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-calendar-plus me-2"></i>Make New Booking
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'bookings:my_bookings' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-list me-2"></i>View All Bookings
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'bookings:restaurant_info' %}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-info-circle me-2"></i>Restaurant Info
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{% url 'users:booking_history' %}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-history me-2"></i>Booking History
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Bookings -->
+    {% if upcoming_bookings %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>Upcoming Bookings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Restaurant</th>
+                                        <th>Party Size</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in upcoming_bookings %}
+                                        <tr>
+                                            <td>{{ booking.date|date:"M j, Y" }}</td>
+                                            <td>{{ booking.time_slot.time|time:"H:i" }}</td>
+                                            <td>{{ booking.restaurant.name }}</td>
+                                            <td>{{ booking.party_size }} guests</td>
+                                            <td>
+                                                <span class="badge bg-success">{{ booking.get_status_display }}</span>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Recent Past Bookings -->
+    {% if past_bookings %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2"></i>Recent Past Bookings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Restaurant</th>
+                                        <th>Party Size</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in past_bookings %}
+                                        <tr>
+                                            <td>{{ booking.date|date:"M j, Y" }}</td>
+                                            <td>{{ booking.time_slot.time|time:"H:i" }}</td>
+                                            <td>{{ booking.restaurant.name }}</td>
+                                            <td>{{ booking.party_size }} guests</td>
+                                            <td>
+                                                <span class="badge bg-{% if booking.status == 'completed' %}success{% elif booking.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                                                    {{ booking.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'bookings:booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- No Bookings Message -->
+    {% if not upcoming_bookings and not past_bookings %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5>No Bookings Yet</h5>
+                        <p class="text-muted">You haven't made any bookings yet. Start by making your first reservation!</p>
+                        <a href="{% url 'bookings:create_booking' %}" class="btn btn-primary">
+                            <i class="fas fa-calendar-plus me-2"></i>Make Your First Booking
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

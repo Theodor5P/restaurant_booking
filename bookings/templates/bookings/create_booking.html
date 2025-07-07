@@ -1,10 +1,99 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create Booking</title>
-</head>
-<body>
-    <h1>Create New Booking</h1>
-    <p>Booking form will be implemented here.</p>
-</body>
-</html> 
+{% extends 'base.html' %}
+
+{% block title %}Make a Booking - Restaurant Booking System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3 class="mb-0">
+                        <i class="fas fa-calendar-plus me-2"></i>Make a Reservation
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if restaurant %}
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>{{ restaurant.name }}
+                            </h5>
+                            <p class="mb-0">{{ restaurant.description }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                    <div class="text-danger small">{{ form.date.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.time_slot.id_for_label }}" class="form-label">Time</label>
+                                {{ form.time_slot }}
+                                {% if form.time_slot.errors %}
+                                    <div class="text-danger small">{{ form.time_slot.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.party_size.id_for_label }}" class="form-label">Number of Guests</label>
+                            {{ form.party_size }}
+                            {% if form.party_size.errors %}
+                                <div class="text-danger small">{{ form.party_size.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Maximum party size: 20 guests</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.special_requests.id_for_label }}" class="form-label">Special Requests</label>
+                            {{ form.special_requests }}
+                            {% if form.special_requests.errors %}
+                                <div class="text-danger small">{{ form.special_requests.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Any dietary requirements or special requests</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-calendar-check me-2"></i>Confirm Booking
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Available Time Slots -->
+            {% if time_slots %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock me-2"></i>Available Time Slots
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for time_slot in time_slots %}
+                                <div class="col-md-3 col-sm-6 mb-2">
+                                    <div class="badge bg-success fs-6 p-2 w-100">
+                                        {{ time_slot.time|time:"H:i" }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

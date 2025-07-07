@@ -1,15 +1,16 @@
 from django.urls import path
-from django.http import HttpResponse
-
-def profile(request):
-    return HttpResponse("User Profile Page")
-
-def dashboard(request):
-    return HttpResponse("User Dashboard Page")
+from . import views
 
 app_name = 'users'
 
 urlpatterns = [
-    path('profile/', profile, name='profile'),
-    path('dashboard/', dashboard, name='dashboard'),
+    # Authentication
+    path('register/', views.register, name='register'),
+    path('login/', views.user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
+    
+    # User dashboard and profile
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('profile/', views.profile, name='profile'),
+    path('booking-history/', views.booking_history, name='booking_history'),
 ] 

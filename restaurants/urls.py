@@ -1,15 +1,14 @@
 from django.urls import path
-from django.http import HttpResponse
-
-def restaurant_list(request):
-    return HttpResponse("Restaurant List Page")
-
-def restaurant_detail(request, restaurant_id):
-    return HttpResponse(f"Restaurant Detail Page - ID: {restaurant_id}")
+from . import views
 
 app_name = 'restaurants'
 
 urlpatterns = [
-    path('', restaurant_list, name='restaurant_list'),
-    path('<int:restaurant_id>/', restaurant_detail, name='restaurant_detail'),
+    # Restaurant views
+    path('', views.restaurant_list, name='restaurant_list'),
+    path('<int:restaurant_id>/', views.restaurant_detail, name='restaurant_detail'),
+    path('dashboard/', views.restaurant_dashboard, name='dashboard'),
+    
+    # Time slots
+    path('time-slots/', views.time_slot_list, name='time_slot_list'),
 ] 
