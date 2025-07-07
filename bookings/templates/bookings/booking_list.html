@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Bookings</title>
+</head>
+<body>
+    <h1>My Bookings</h1>
+    {% for booking in bookings %}
+        <h2>{{ booking.restaurant.name }}</h2>
+        <p>Date: {{ booking.date }}</p>
+        <p>Time: {{ booking.time_slot.time }}</p>
+        <p>Status: {{ booking.status }}</p>
+    {% endfor %}
+</body>
+</html> 

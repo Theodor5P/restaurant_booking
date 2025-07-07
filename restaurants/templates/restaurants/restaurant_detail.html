@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ restaurant.name }}</title>
+</head>
+<body>
+    <h1>{{ restaurant.name }}</h1>
+    <p>{{ restaurant.description }}</p>
+    <h2>Available Time Slots:</h2>
+    {% for slot in time_slots %}
+        <p>{{ slot.formatted_time }}</p>
+    {% endfor %}
+</body>
+</html> 
